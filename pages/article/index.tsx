@@ -13,8 +13,8 @@ const Artcile: NextPage = () => {
     const user = useUser()
     const { id } = router.query
     const [article, setArticle] = useState<any>({})
-    const [heartColor, setHeartColor] = useState("#D8DBDF")
-    const [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState(false)
+    let [heartColor, setHeartColor] = useState("#D8DBDF")
+    let [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState(false)
 
 
     useEffect(() => {
@@ -30,14 +30,18 @@ const Artcile: NextPage = () => {
                 } else {
                     const arrayOfUsersLikes = data.likes
                     let isLikedByCurrentUser = false
+                    console.log("rendering")
+                    const userId = user?.id
                     arrayOfUsersLikes?.filter( (user_id: string) => {
-                            if (user?.id === user_id) {
-                                setHeartColor("#E33122")
+                            if (userId == user_id) {
                                 isLikedByCurrentUser = true
                             }
                         }
                     )
                     console.log(data)
+                    if(isLikedByCurrentUser) {
+                        setHeartColor("#E33122")
+                    }
                     setArticleLikedByCurrentUser(isLikedByCurrentUser)
                     setArticle(data)
                 }
@@ -90,7 +94,6 @@ const Artcile: NextPage = () => {
     }
 
     const handleLike = async () => {
-
         if (!isArticleLikedByCurrentUser) {
             let arrayOfUsersLikes: string[] = article.likes ?? []
             arrayOfUsersLikes.push(user?.id ?? "")
