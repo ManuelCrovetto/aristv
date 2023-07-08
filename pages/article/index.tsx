@@ -117,7 +117,7 @@ const Artcile: NextPage = () => {
     }
 
     const handleConfetti = () => {
-        var interval = setInterval(function () {
+        let interval: NodeJS.Timer = setInterval(function () {
         var timeLeft = animationEnd - Date.now();
 
         if (timeLeft <= 0) {
