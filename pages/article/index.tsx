@@ -5,7 +5,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { HeartIcon } from "../../components/icons/icons";
 import confetti from 'canvas-confetti';
-import { faL } from "@fortawesome/free-solid-svg-icons";
+import sleep from "../../utils/sleep";
+
 
 const Artcile: NextPage = () => {
     const supabaseClient = useSupabaseClient();
@@ -28,6 +29,7 @@ const Artcile: NextPage = () => {
                 if (error) {
                     console.log(error)
                 } else {
+                    await sleep(1000)
                     const arrayOfUsersLikes: string[] = data.likes ?? [];
                     let isLikedByCurrentUser = false;
                     console.log("rendering");
