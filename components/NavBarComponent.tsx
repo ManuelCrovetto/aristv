@@ -1,8 +1,7 @@
-import { Navbar, Button, Text, Dropdown, Avatar } from "@nextui-org/react";
+import { Navbar, Button, Text, Link } from "@nextui-org/react";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 import { useRouter } from "next/router";
-import Link from "next/link";
 import React from "react";
 import { Layout } from "./Layout";
 
@@ -78,9 +77,7 @@ const NavBarComponent = () => {
                         <Link
                             color="inherit"
                             href={"/mainFeed"}
-                            css={{
-                                minWidth: "100%",
-                              }}
+                            css={{minWidth: "100%",}}
                         >
                             {"Main Feed"}
                         </Link>
@@ -93,9 +90,7 @@ const NavBarComponent = () => {
                         <Link
                             color="inherit"
                             href={"/createArticle"}
-                            css={{
-                                minWidth: "100%",
-                              }}
+                            css={{minWidth: "100%",}}
                         >
                             {"Create Proposal"}
                         </Link>
