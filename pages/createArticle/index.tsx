@@ -161,7 +161,7 @@ const Login: NextPage = () => {
                 </Text>
             </Grid>
             <Grid xs={12} justify='flex-end' css={{marginRight: 16}}>
-                <Text color="#7C7C7C">Posting as {user?.email}</Text>
+                <Text color="#7C7C7C">Posting as {user?.email} (chill bro, it will be anonymous 🥷🏻)</Text>
             </Grid>
             <Button isDisabled={isLoading} shadow css={{margin: '0 auto', display: "flex", marginTop: 16}} onPress={onSubmit}>
               {isLoading ?
