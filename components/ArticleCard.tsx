@@ -1,7 +1,7 @@
 import { Button, Card, Container, Grid, Image, Row, Spacer, Text } from "@nextui-org/react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { getDateString } from "../pages/utils/Utils";
+import { getDateString } from "../utils/Utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDisplay, faHeart } from "@fortawesome/free-solid-svg-icons";
 

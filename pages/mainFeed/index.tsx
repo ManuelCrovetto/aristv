@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import ArticleCard from "../../components/ArticleCard";
-import { getPagination } from "../utils/Utils";
+import { getPagination } from "../../utils/Utils";
 import { faL } from "@fortawesome/free-solid-svg-icons";
 
 interface Article {

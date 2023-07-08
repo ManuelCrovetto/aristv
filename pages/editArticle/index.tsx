@@ -6,7 +6,7 @@ import { Text, Textarea, Grid, Button, Loading, Modal, useInput, Row, Container 
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import { useState } from "react";
 import confetti from 'canvas-confetti';
-import sleep from "../utils/sleep";
+import sleep from "../../utils/sleep";
 import { Box } from "../../components/Box";
 import { count } from "console";
 import { useEffect } from "react";
