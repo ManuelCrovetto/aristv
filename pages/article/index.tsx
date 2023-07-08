@@ -40,6 +40,7 @@ const Artcile: NextPage = () => {
                     );
                     console.log(data);
                     if(isLikedByCurrentUser) {
+                        console.log("liked")
                         setHeartColor("#E33122");
                     }
                     setArticleLikedByCurrentUser(isLikedByCurrentUser);
