@@ -32,8 +32,11 @@ const Artcile: NextPage = () => {
                     let isLikedByCurrentUser = false;
                     console.log("rendering");
                     const userId = user?.id;
+                    console.log(`userid: ${userId}`);
                     arrayOfUsersLikes.filter( (user_id: string) => {
+                        console.log(`iterating... userId: ${userId}`);
                             if (userId == user_id) {
+                                console.log("userId found into iteration");
                                 isLikedByCurrentUser = true
                             }
                         }
