@@ -29,16 +29,16 @@ const Artcile: NextPage = () => {
                     console.log(error)
                 } else {
                     const arrayOfUsersLikes = data.likes
-                    console.log(`checking if article is liked: ${arrayOfUsersLikes}`)
+                    let isLikedByCurrentUser = false
                     arrayOfUsersLikes?.filter( (user_id: string) => {
                             if (user?.id === user_id) {
-                                console.log("IT IS THERE")
                                 setHeartColor("#E33122")
-                                setArticleLikedByCurrentUser(true)
+                                isLikedByCurrentUser = true
                             }
                         }
                     )
                     console.log(data)
+                    setArticleLikedByCurrentUser(isLikedByCurrentUser)
                     setArticle(data)
                 }
 
