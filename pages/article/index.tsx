@@ -8,13 +8,13 @@ import confetti from 'canvas-confetti';
 import { faL } from "@fortawesome/free-solid-svg-icons";
 
 const Artcile: NextPage = () => {
-    const supabaseClient = useSupabaseClient()
-    const router = useRouter()
-    const user = useUser()
-    const { id } = router.query
-    const [article, setArticle] = useState<any>({})
-    let [heartColor, setHeartColor] = useState<string>()
-    let [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState<boolean>()
+    const supabaseClient = useSupabaseClient();
+    const router = useRouter();
+    const user = useUser();
+    const { id } = router.query;
+    const [article, setArticle] = useState<any>({});
+    let [heartColor, setHeartColor] = useState<string>();
+    let [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState<boolean>();
 
 
     useEffect(() => {
@@ -28,28 +28,28 @@ const Artcile: NextPage = () => {
                 if (error) {
                     console.log(error)
                 } else {
-                    const arrayOfUsersLikes: string[] = data.likes ?? []
-                    let isLikedByCurrentUser = false
-                    console.log("rendering")
-                    const userId = user?.id
+                    const arrayOfUsersLikes: string[] = data.likes ?? [];
+                    let isLikedByCurrentUser = false;
+                    console.log("rendering");
+                    const userId = user?.id;
                     arrayOfUsersLikes.filter( (user_id: string) => {
                             if (userId == user_id) {
                                 isLikedByCurrentUser = true
                             }
                         }
                     )
-                    console.log(data)
+                    console.log(data);
                     if(isLikedByCurrentUser) {
-                        setHeartColor("#E33122")
+                        setHeartColor("#E33122");
                     }
-                    setArticleLikedByCurrentUser(isLikedByCurrentUser)
-                    setArticle(data)
+                    setArticleLikedByCurrentUser(isLikedByCurrentUser);
+                    setArticle(data);
                 }
 
         }
         
         if (typeof id !== "undefined") {
-            getArticleWithUseEffect()
+            getArticleWithUseEffect();
         }
     }, [id])
 
@@ -68,12 +68,12 @@ const Artcile: NextPage = () => {
 
                     arrayOfUsersLikes?.filter( (user_id: string) => {
                             if (user?.id === user_id) {
-                                setHeartColor("#E33122")
+                                setHeartColor("#E33122");
                                 isLikedByCurrentUser = true
                             }
                         }
                     )
-                    setArticleLikedByCurrentUser(isLikedByCurrentUser)
+                    setArticleLikedByCurrentUser(isLikedByCurrentUser);
                     console.log(data)
                     setArticle(data)
                 }
@@ -110,18 +110,18 @@ const Artcile: NextPage = () => {
                     .eq("id", id)
                     if(error) throw error
 
-                    getArticle()
-                    setHeartColor("#E33122")
-                    handleConfetti()
+                    getArticle();
+                    setHeartColor("#E33122");
+                    handleConfetti();
             } catch (error: any) {  
                 alert(error.message)
             }
         }
         if(isArticleLikedByCurrentUser) {
-            let arrayOfUsersLikes: string[] = article.likes ?? []
-            const index = arrayOfUsersLikes.indexOf(user?.id ?? "")
-            arrayOfUsersLikes.splice(index, 1)
-            let likesQty = arrayOfUsersLikes.length
+            let arrayOfUsersLikes: string[] = article.likes ?? [];
+            const index = arrayOfUsersLikes.indexOf(user?.id ?? "");
+            arrayOfUsersLikes.splice(index, 1);
+            let likesQty = arrayOfUsersLikes.length;
             try {
                 const {data, error} = await supabaseClient
                     .from("articles")
@@ -133,9 +133,9 @@ const Artcile: NextPage = () => {
                     ])
                     .eq("id", id)
                     if(error) throw error
-                    getArticle()
+                    getArticle();
 
-                    setHeartColor("#D8DBDF")
+                    setHeartColor("#D8DBDF");
 
             } catch (error: any) {  
                 alert(error.message)
