@@ -29,7 +29,7 @@ const Artcile: NextPage = () => {
                 if (error) {
                     console.log(error)
                 } else {
-                    await sleep(1000)
+
                     const arrayOfUsersLikes: string[] = data.likes ?? [];
                     let isLikedByCurrentUser = false;
                     console.log("rendering");
