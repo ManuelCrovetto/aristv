@@ -51,7 +51,7 @@ const ArticleCard: NextPage<Props> = (props) => {
                     <Grid>
                         <Text h3  >{article.title}</Text>
                         <Text b>posted on {getDate()}</Text>
-                        <Text b> By {article.user_email.toLowerCase()}</Text>
+                        <Text b> by {article.user_id.substring(0,5)}</Text>
                         <Spacer y={.5}/>
                     </Grid>
                     <Grid css={{mt: '0 auto', display: 'flex'}} alignItems="center">

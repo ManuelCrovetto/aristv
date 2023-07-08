@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { HeartIcon } from "../../components/icons/icons";
 import confetti from 'canvas-confetti';
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 const Artcile: NextPage = () => {
     const supabaseClient = useSupabaseClient()
@@ -17,7 +18,7 @@ const Artcile: NextPage = () => {
 
 
     useEffect(() => {
-        async function getArticle() {
+        async function getArticleWithUseEffect() {
             const { data, error } = await supabaseClient
                 .from("articles")
                 .select("*")
@@ -44,9 +45,35 @@ const Artcile: NextPage = () => {
         }
         
         if (typeof id !== "undefined") {
-            getArticle()
+            getArticleWithUseEffect()
         }
     }, [id])
+
+    const getArticle = async () => {
+        const { data, error } = await supabaseClient
+                .from("articles")
+                .select("*")
+                .filter("id", "eq", id)
+                .single()
+
+                if (error) {
+                    console.log(error)
+                } else {
+                    const arrayOfUsersLikes = data.likes
+                    let isLikedByCurrentUser = false
+
+                    arrayOfUsersLikes?.filter( (user_id: string) => {
+                            if (user?.id === user_id) {
+                                setHeartColor("#E33122")
+                                isLikedByCurrentUser = true
+                            }
+                        }
+                    )
+                    setArticleLikedByCurrentUser(isLikedByCurrentUser)
+                    console.log(data)
+                    setArticle(data)
+                }
+    }
 
 
     const deleteArticle = async () => {
@@ -63,6 +90,7 @@ const Artcile: NextPage = () => {
     }
 
     const handleLike = async () => {
+
         if (!isArticleLikedByCurrentUser) {
             let arrayOfUsersLikes: string[] = article.likes ?? []
             arrayOfUsersLikes.push(user?.id ?? "")
@@ -78,6 +106,8 @@ const Artcile: NextPage = () => {
                     ])
                     .eq("id", id)
                     if(error) throw error
+
+                    getArticle()
                     setHeartColor("#E33122")
                     handleConfetti()
             } catch (error: any) {  
@@ -100,6 +130,8 @@ const Artcile: NextPage = () => {
                     ])
                     .eq("id", id)
                     if(error) throw error
+                    getArticle()
+
                     setHeartColor("#D8DBDF")
 
             } catch (error: any) {  
@@ -157,7 +189,7 @@ const Artcile: NextPage = () => {
                 <>
                     <Spacer y={.5}/>
                     <Button size={"sm"} auto shadow color="primary" iconRight={HeartIcon(heartColor)} onPress={handleLike}>
-                        Like
+                        {article.likes_count}
                     </Button>
                 </>
             : null
