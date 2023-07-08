@@ -28,11 +28,11 @@ const Artcile: NextPage = () => {
                 if (error) {
                     console.log(error)
                 } else {
-                    const arrayOfUsersLikes = data.likes
+                    const arrayOfUsersLikes: string[] = data.likes ?? []
                     let isLikedByCurrentUser = false
                     console.log("rendering")
                     const userId = user?.id
-                    arrayOfUsersLikes?.filter( (user_id: string) => {
+                    arrayOfUsersLikes.filter( (user_id: string) => {
                             if (userId == user_id) {
                                 isLikedByCurrentUser = true
                             }
