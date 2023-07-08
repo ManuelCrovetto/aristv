@@ -13,8 +13,8 @@ const Artcile: NextPage = () => {
     const user = useUser()
     const { id } = router.query
     const [article, setArticle] = useState<any>({})
-    let [heartColor, setHeartColor] = useState("#D8DBDF")
-    let [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState(false)
+    let [heartColor, setHeartColor] = useState<string>()
+    let [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState<boolean>()
 
 
     useEffect(() => {
