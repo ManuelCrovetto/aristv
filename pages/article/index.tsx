@@ -191,7 +191,7 @@ const Artcile: NextPage = () => {
             { user ?
                 <>
                     <Spacer y={.5}/>
-                    <Button size={"sm"} auto shadow color="primary" iconRight={HeartIcon(heartColor)} onPress={handleLike}>
+                    <Button size={"sm"} auto shadow color="primary" iconRight={HeartIcon(heartColor ?? "#D8DBDF")} onPress={handleLike}>
                         {article.likes_count}
                     </Button>
                 </>
