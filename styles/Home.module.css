@@ -127,3 +127,11 @@
     filter: invert(1);
   }
 }
+
+.textLimited {
+  width: 300px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
