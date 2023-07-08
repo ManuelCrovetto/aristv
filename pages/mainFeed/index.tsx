@@ -74,8 +74,8 @@ const MainFeed: NextPage = () => {
 
     return (
         <>
-            <Text h2>Main Feed</Text>
-            <Text size="$lg" css={{my: "$8"}}>Check out the latests topics</Text>
+            <Text h2>Main Proposals</Text>
+            <Text size="$lg" css={{my: "$8"}}>Check out the latests proposals</Text>
             
             {
             articles.map((article) => {
