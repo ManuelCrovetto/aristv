@@ -37,7 +37,7 @@ const Artcile: NextPage = () => {
                                 isLikedByCurrentUser = true
                             }
                         }
-                    )
+                    );
                     console.log(data);
                     if(isLikedByCurrentUser) {
                         setHeartColor("#E33122");
@@ -51,7 +51,7 @@ const Artcile: NextPage = () => {
         if (typeof id !== "undefined") {
             getArticleWithUseEffect();
         }
-    }, [id])
+    }, [id, heartColor])
 
     const getArticle = async () => {
         const { data, error } = await supabaseClient
