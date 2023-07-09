@@ -12,6 +12,7 @@ const Artcile: NextPage = () => {
     const supabaseClient = useSupabaseClient();
     const router = useRouter();
     const user = useUser();
+    
     const { id } = router.query;
     const [article, setArticle] = useState<any>({});
     let [heartColor, setHeartColor] = useState<string>();
@@ -20,6 +21,10 @@ const Artcile: NextPage = () => {
 
     useEffect(() => {
         async function getArticleWithUseEffect() {
+            const { data: { user } } = await supabaseClient.auth.getUser()
+
+            console.log(`experimental: ${user}`)
+
             const { data, error } = await supabaseClient
                 .from("articles")
                 .select("*")
