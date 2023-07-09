@@ -56,7 +56,7 @@ const Article: NextPage = () => {
         }
 
         if (typeof id !== "undefined") {
-            getArticleWithUseEffect();
+            getArticleWithUseEffect().then(() => {});
         }
     }, [id, supabaseClient])
 
@@ -203,7 +203,7 @@ const Article: NextPage = () => {
                     <Spacer y={.5}/>
                     <User
                         src="https://i.ytimg.com/vi/U812TsXhZmQ/maxresdefault.jpg"
-                        name={article.user_email?.toLowerCase()}
+                        name={article.user_id.substring(0,5)}
                         size="md"
                     />
                     <Spacer y={.5}/>
