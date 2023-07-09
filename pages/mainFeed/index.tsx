@@ -4,16 +4,6 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import ArticleCard from "../../components/ArticleCard";
 import { getPagination } from "../../utils/Utils";
-import { faL } from "@fortawesome/free-solid-svg-icons";
-
-interface Article {
-    id: number,
-    user_id: string,
-    title: string,
-    content: string,
-    user_email: string
-    inserted_at: string
-}
 
 const MainFeed: NextPage = () => {
     const supabaseClient = useSupabaseClient();
@@ -22,8 +12,8 @@ const MainFeed: NextPage = () => {
     const [numberOfPages, setNumberOfPages] = useState(0)
 
     useEffect(() => {
-        getArticlesSize()
-        loadFirstArticlesPage()
+        getArticlesSize().then(() => {})
+        loadFirstArticlesPage().then(() => {})
     }, [])
 
     const getArticlesSize = async () => {
@@ -48,7 +38,9 @@ const MainFeed: NextPage = () => {
                 .select("*", { count: "exact" })
                 .order("likes_count", { ascending: false })
                 .range(0, 9)
-
+            if (error) {
+                alert(error.message)
+            }
             if (data != null) {
                 setArticles(data)
             }
