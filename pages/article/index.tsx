@@ -11,7 +11,7 @@ import sleep from "../../utils/sleep";
 const Artcile: NextPage = () => {
     const supabaseClient = useSupabaseClient();
     const router = useRouter();
-    const user = useUser();
+    const supaUser = useUser();
     
     const { id } = router.query;
     const [article, setArticle] = useState<any>({});
@@ -21,9 +21,7 @@ const Artcile: NextPage = () => {
 
     useEffect(() => {
         async function getArticleWithUseEffect() {
-            await supabaseClient.auth.getUser()
-
-            console.log(`experimental: ${user}`)
+            const { data: { user } } = await supabaseClient.auth.getUser()
 
             const { data, error } = await supabaseClient
                 .from("articles")
@@ -79,7 +77,7 @@ const Artcile: NextPage = () => {
                     let isLikedByCurrentUser = false
 
                     arrayOfUsersLikes?.filter( (user_id: string) => {
-                            if (user?.id === user_id) {
+                            if (supaUser?.id === user_id) {
                                 setHeartColor("#E33122");
                                 isLikedByCurrentUser = true
                             }
@@ -108,7 +106,7 @@ const Artcile: NextPage = () => {
     const handleLike = async () => {
         if (!isArticleLikedByCurrentUser) {
             let arrayOfUsersLikes: string[] = article.likes ?? []
-            arrayOfUsersLikes.push(user?.id ?? "")
+            arrayOfUsersLikes.push(supaUser?.id ?? "")
             const likesQty = arrayOfUsersLikes.length
             try {
                 const {data, error} = await supabaseClient
@@ -131,7 +129,7 @@ const Artcile: NextPage = () => {
         }
         if(isArticleLikedByCurrentUser) {
             let arrayOfUsersLikes: string[] = article.likes ?? [];
-            const index = arrayOfUsersLikes.indexOf(user?.id ?? "");
+            const index = arrayOfUsersLikes.indexOf(supaUser?.id ?? "");
             arrayOfUsersLikes.splice(index, 1);
             let likesQty = arrayOfUsersLikes.length;
             try {
@@ -200,7 +198,7 @@ const Artcile: NextPage = () => {
             <Spacer y={.5}/>
 
             <Text size={"$lg"}>{article.content}</Text>
-            { user ?
+            { supaUser ?
                 <>
                     <Spacer y={.5}/>
                     <Button size={"sm"} auto shadow color="primary" iconRight={HeartIcon(heartColor ?? "#D8DBDF")} onPress={handleLike}>
@@ -209,7 +207,7 @@ const Artcile: NextPage = () => {
                 </>
             : null
             }
-            {user && article.user_id === user.id ?
+            {supaUser && article.user_id === supaUser.id ?
                 <>
                     <Spacer y={1}/>
                     <Button size={"sm"} onPress={() => router.push("/editArticle?id=" + id)}>Edit</Button>
