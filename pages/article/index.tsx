@@ -15,13 +15,13 @@ const Artcile: NextPage = () => {
     
     const { id } = router.query;
     const [article, setArticle] = useState<any>({});
-    let [heartColor, setHeartColor] = useState<string>();
-    let [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState<boolean>();
+    const [heartColor, setHeartColor] = useState<string>();
+    const [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState<boolean>();
 
 
     useEffect(() => {
         async function getArticleWithUseEffect() {
-            const { data: { user } } = await supabaseClient.auth.getUser()
+            await supabaseClient.auth.getUser()
 
             console.log(`experimental: ${user}`)
 
@@ -38,26 +38,23 @@ const Artcile: NextPage = () => {
                     const arrayOfUsersLikes: string[] = data.likes ?? [];
                     let isLikedByCurrentUser = false;
                     console.log("rendering");
-                    
-                    supabaseClient.auth.onAuthStateChange((_event, session) => {
-                        const userId = user?.id;
-                        console.log(`userid: ${userId}`);
-                        arrayOfUsersLikes.filter( (user_id: string) => {
-                            console.log(`iterating... userId: ${userId}`);
-                                if (userId == user_id) {
-                                    console.log("userId found into iteration");
-                                    isLikedByCurrentUser = true
-                                }
+                    const userId = user?.id;
+                    console.log(`userid: ${userId}`);
+                    arrayOfUsersLikes.filter( (user_id: string) => {
+                        console.log(`iterating... userId: ${userId}`);
+                            if (userId == user_id) {
+                                console.log("userId found into iteration");
+                                isLikedByCurrentUser = true
                             }
-                        );
-                        console.log(data);
-                        if(isLikedByCurrentUser) {
-                            console.log("liked")
-                            setHeartColor("#E33122");
                         }
-                        setArticleLikedByCurrentUser(isLikedByCurrentUser);
-                        setArticle(data);
-                    })
+                    );
+                    console.log(data);
+                    if(isLikedByCurrentUser) {
+                         console.log("liked")
+                        setHeartColor("#E33122");
+                    }
+                    setArticleLikedByCurrentUser(isLikedByCurrentUser);
+                    setArticle(data);
                     
                 }
 
