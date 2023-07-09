@@ -1,93 +1,104 @@
-import { Button, Spacer, Text, User } from "@nextui-org/react";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import { NextPage } from "next";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { HeartIcon } from "../../components/icons/icons";
+import {Button, Loading, Spacer, Text, User} from "@nextui-org/react";
+import {useSupabaseClient, useUser} from "@supabase/auth-helpers-react";
+import {NextPage} from "next";
+import {useRouter} from "next/router";
+import {useEffect, useState} from "react";
+import {HeartIcon} from "../../components/icons/icons";
 import confetti from 'canvas-confetti';
-import { faL } from "@fortawesome/free-solid-svg-icons";
 
-const Artcile: NextPage = () => {
-    const supabaseClient = useSupabaseClient()
-    const router = useRouter()
-    const user = useUser()
-    const { id } = router.query
-    const [article, setArticle] = useState<any>({})
-    let [heartColor, setHeartColor] = useState<string>()
-    let [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState<boolean>()
+
+const Article: NextPage = () => {
+    const supabaseClient = useSupabaseClient();
+    const router = useRouter();
+    const supaUser = useUser();
+    const [isLoading, setIsLoading] = useState(false)
+    const {id} = router.query;
+    const [article, setArticle] = useState<any>({});
+    const [heartColor, setHeartColor] = useState<string>();
+    const [isArticleLikedByCurrentUser, setArticleLikedByCurrentUser] = useState<boolean>();
 
 
     useEffect(() => {
         async function getArticleWithUseEffect() {
-            const { data, error } = await supabaseClient
-                .from("articles")
-                .select("*")
-                .filter("id", "eq", id)
-                .single()
+            setIsLoading(true)
+            const {data: {user}} = await supabaseClient.auth.getUser()
 
+            try {
+                const {data, error} = await supabaseClient
+                    .from("articles")
+                    .select("*")
+                    .filter("id", "eq", id)
+                    .single()
                 if (error) {
                     console.log(error)
                 } else {
-                    const arrayOfUsersLikes: string[] = data.likes ?? []
-                    let isLikedByCurrentUser = false
-                    console.log("rendering")
-                    const userId = user?.id
-                    arrayOfUsersLikes.filter( (user_id: string) => {
+                    const arrayOfUsersLikes: string[] = data.likes ?? [];
+                    let isLikedByCurrentUser = false;
+                    const userId = user?.id;
+                    arrayOfUsersLikes.filter((user_id: string) => {
                             if (userId == user_id) {
                                 isLikedByCurrentUser = true
                             }
                         }
-                    )
-                    console.log(data)
-                    if(isLikedByCurrentUser) {
-                        setHeartColor("#E33122")
+                    );
+                    if (isLikedByCurrentUser) {
+                        setHeartColor("#E33122");
                     }
-                    setArticleLikedByCurrentUser(isLikedByCurrentUser)
-                    setArticle(data)
-                }
+                    setArticleLikedByCurrentUser(isLikedByCurrentUser);
+                    setArticle(data);
 
+                }
+                setIsLoading(false)
+            } catch (error: any) {
+                alert(error.message)
+                setIsLoading(false)
+            }
         }
-        
+
         if (typeof id !== "undefined") {
-            getArticleWithUseEffect()
+            getArticleWithUseEffect();
         }
-    }, [id])
+    }, [id, supabaseClient])
 
     const getArticle = async () => {
-        const { data, error } = await supabaseClient
-                .from("articles")
-                .select("*")
-                .filter("id", "eq", id)
-                .single()
+        const {data, error} = await supabaseClient
+            .from("articles")
+            .select("*")
+            .filter("id", "eq", id)
+            .single()
 
-                if (error) {
-                    console.log(error)
-                } else {
-                    const arrayOfUsersLikes = data.likes
-                    let isLikedByCurrentUser = false
+        if (error) {
+            console.log(error)
+        } else {
+            const arrayOfUsersLikes = data.likes
+            let isLikedByCurrentUser = false
 
-                    arrayOfUsersLikes?.filter( (user_id: string) => {
-                            if (user?.id === user_id) {
-                                setHeartColor("#E33122")
-                                isLikedByCurrentUser = true
-                            }
-                        }
-                    )
-                    setArticleLikedByCurrentUser(isLikedByCurrentUser)
-                    console.log(data)
-                    setArticle(data)
+            arrayOfUsersLikes?.filter((user_id: string) => {
+                    if (supaUser?.id === user_id) {
+                        isLikedByCurrentUser = true
+                    }
                 }
+            )
+            if (isLikedByCurrentUser) {
+                setHeartColor("#E33122");
+            }
+            setArticleLikedByCurrentUser(isLikedByCurrentUser);
+            setArticle(data)
+        }
     }
 
 
     const deleteArticle = async () => {
         try {
-            const { data, error} = await supabaseClient
-            .from("articles")
-            .delete()
-            .eq("id", id)
-            if (error) throw error
-            router.push("/mainFeed")
+            const {error} = await supabaseClient
+                .from("articles")
+                .delete()
+                .eq("id", id)
+            if (error) {
+                alert(error.message)
+                await router.push("/mainFeed")
+            }
+            await router.push("/mainFeed")
         } catch (error: any) {
             alert(error.message)
         }
@@ -96,10 +107,10 @@ const Artcile: NextPage = () => {
     const handleLike = async () => {
         if (!isArticleLikedByCurrentUser) {
             let arrayOfUsersLikes: string[] = article.likes ?? []
-            arrayOfUsersLikes.push(user?.id ?? "")
+            arrayOfUsersLikes.push(supaUser?.id ?? "")
             const likesQty = arrayOfUsersLikes.length
             try {
-                const {data, error} = await supabaseClient
+                const {error} = await supabaseClient
                     .from("articles")
                     .update([
                         {
@@ -108,22 +119,23 @@ const Artcile: NextPage = () => {
                         }
                     ])
                     .eq("id", id)
-                    if(error) throw error
-
-                    getArticle()
-                    setHeartColor("#E33122")
-                    handleConfetti()
-            } catch (error: any) {  
+                if (error) {
+                    alert(error.message)
+                }
+                await getArticle();
+                setHeartColor("#E33122");
+                handleConfetti();
+            } catch (error: any) {
                 alert(error.message)
             }
         }
-        if(isArticleLikedByCurrentUser) {
-            let arrayOfUsersLikes: string[] = article.likes ?? []
-            const index = arrayOfUsersLikes.indexOf(user?.id ?? "")
-            arrayOfUsersLikes.splice(index, 1)
-            let likesQty = arrayOfUsersLikes.length
+        if (isArticleLikedByCurrentUser) {
+            let arrayOfUsersLikes: string[] = article.likes ?? [];
+            const index = arrayOfUsersLikes.indexOf(supaUser?.id ?? "");
+            arrayOfUsersLikes.splice(index, 1);
+            let likesQty = arrayOfUsersLikes.length;
             try {
-                const {data, error} = await supabaseClient
+                const {error} = await supabaseClient
                     .from("articles")
                     .update([
                         {
@@ -132,20 +144,21 @@ const Artcile: NextPage = () => {
                         }
                     ])
                     .eq("id", id)
-                    if(error) throw error
-                    getArticle()
+                if (error) {
+                    alert(error.message)
+                }
+                await getArticle();
+                setHeartColor("#D8DBDF");
 
-                    setHeartColor("#D8DBDF")
-
-            } catch (error: any) {  
+            } catch (error: any) {
                 alert(error.message)
             }
         }
     }
 
-    var duration = 5 * 1000;
-    var animationEnd = Date.now() + duration;
-    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    const duration = 5 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = {startVelocity: 30, spread: 360, ticks: 60, zIndex: 0};
 
     function randomInRange(min: number, max: number) {
         return Math.random() * (max - min) + min;
@@ -153,67 +166,81 @@ const Artcile: NextPage = () => {
 
     const handleConfetti = () => {
         let interval: NodeJS.Timer = setInterval(function () {
-        var timeLeft = animationEnd - Date.now();
+            const timeLeft = animationEnd - Date.now();
 
-        if (timeLeft <= 0) {
-            return clearInterval(interval);
-        }
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
 
-        var particleCount = 50 * (timeLeft / duration);
-        // since particles fall down, start a bit higher than random
-        confetti(
-            Object.assign({}, defaults, {
-            particleCount,
-            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-            })
-        );
-        confetti(
-            Object.assign({}, defaults, {
-            particleCount,
-            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-            })
-        );
+            const particleCount = 50 * (timeLeft / duration);
+            // since particles fall down, start a bit higher than random
+            confetti(
+                Object.assign({}, defaults, {
+                    particleCount,
+                    origin: {x: randomInRange(0.1, 0.3), y: Math.random() - 0.2}
+                })
+            );
+            confetti(
+                Object.assign({}, defaults, {
+                    particleCount,
+                    origin: {x: randomInRange(0.7, 0.9), y: Math.random() - 0.2}
+                })
+            );
         }, 250);
     };
- 
+
     return (
         <>
-            <Text h2>{article.title}</Text>
-            <Spacer y={.5}/>
-            <User 
-                src="https://i.ytimg.com/vi/U812TsXhZmQ/maxresdefault.jpg"
-                name={article.user_email?.toLowerCase()}
-                size="md"
-            />
-            <Spacer y={.5}/>
-
-            <Text size={"$lg"}>{article.content}</Text>
-            { user ?
+            {isLoading ?
                 <>
-                    <Spacer y={.5}/>
-                    <Button size={"sm"} auto shadow color="primary" iconRight={HeartIcon(heartColor)} onPress={handleLike}>
-                        {article.likes_count}
-                    </Button>
+
+                    <Loading type="points" color="primary" css={{display: "flex", margin: "0 auto"}}/>
                 </>
-            : null
+                :
+
+                <>
+                    <Text h2>{article.title}</Text>
+                    <Spacer y={.5}/>
+                    <User
+                        src="https://i.ytimg.com/vi/U812TsXhZmQ/maxresdefault.jpg"
+                        name={article.user_email?.toLowerCase()}
+                        size="md"
+                    />
+                    <Spacer y={.5}/>
+
+                    <Text size={"$lg"}>{article.content}</Text>
+                    {supaUser ?
+                        <>
+                            <Spacer y={.5}/>
+                            <Button
+                                size={"sm"}
+                                auto
+                                shadow
+                                color="primary"
+                                iconRight={HeartIcon(heartColor ?? "#D8DBDF")} onPress={handleLike}>
+                                {article.likes_count}
+                            </Button>
+                        </>
+                        : null
+                    }
+                    {supaUser && article.user_id === supaUser.id ?
+                        <>
+                            <Spacer y={1}/>
+                            <Button size={"sm"} onPress={() => router.push("/editArticle?id=" + id)}>Edit</Button>
+                            <Spacer y={.5}/>
+                            <Button
+                                flat
+                                size={"sm"}
+                                color={"error"}
+                                onPress={() => deleteArticle()}>
+                                Delete
+                            </Button>
+                        </>
+                        : null}
+                </>
             }
-            {user && article.user_id === user.id ?
-                <>
-                    <Spacer y={1}/>
-                    <Button size={"sm"} onPress={() => router.push("/editArticle?id=" + id)}>Edit</Button>
-                    <Spacer y={.5}/>
-                    <Button 
-                        flat
-                        size={"sm"} 
-                        color={"error"}
-                        onPress={() => deleteArticle()}>
-                            Delete
-                    </Button>
-                </>
-            : null}
         </>
-
     )
 }
 
-export default Artcile;
+export default Article;
