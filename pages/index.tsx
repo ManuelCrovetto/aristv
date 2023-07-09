@@ -11,9 +11,10 @@ export default function Home() {
     <Text size="$1g">
       Cmon, sometimes we all want Aris to speak about a certain subject in the Android Development world.
       Or we just want to troll him.
-      Any proposal is in your mind for him, publish it here and if it gets likes MAYBE he will do something about it who knows!
+      Any proposal is in your mind for him, publish it here and if it gets likes MAYBE he will do something about it, who knows!
     </Text>
-    
+      <Spacer y={.5}/>
+    <Text b>Keep in mind your proposal will be anonymous 😉🥷🏻</Text>
     <Spacer y={10}/>
     <Grid.Container justify="center" gap={2}>
       <Grid>

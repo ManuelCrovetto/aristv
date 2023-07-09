@@ -51,5 +51,5 @@ export const getPagination = (page: number, size: number) => {
         default:
             month = "Unknown"
     }
-    return `${day} ${month} ${year}`
+    return `${day} ${month}`
   }

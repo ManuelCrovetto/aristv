@@ -203,7 +203,7 @@ const Article: NextPage = () => {
                     <Spacer y={.5}/>
                     <User
                         src="https://i.ytimg.com/vi/U812TsXhZmQ/maxresdefault.jpg"
-                        name={article.user_id.substring(0,5)}
+                        name={article.user_id?.substring(0,5)}
                         size="md"
                     />
                     <Spacer y={.5}/>

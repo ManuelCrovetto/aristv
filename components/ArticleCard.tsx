@@ -1,11 +1,7 @@
-import { Button, Card, Container, Grid, Image, Row, Spacer, Text } from "@nextui-org/react";
+import { Button, Card, Grid, Spacer, Text } from "@nextui-org/react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { getDateString } from "../utils/Utils";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faDisplay, faHeart } from "@fortawesome/free-solid-svg-icons";
-
-import css from "styled-jsx/css";
 import { HeartIcon } from "./icons/icons";
 
 
