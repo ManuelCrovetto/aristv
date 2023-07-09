@@ -1,13 +1,11 @@
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
-import { Text, Textarea, Grid, Button, Loading, Modal, useInput, Row, Container } from "@nextui-org/react";
+import {Text, Textarea, Grid, Button, Loading, Modal, useInput, Spacer} from "@nextui-org/react";
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import { useState } from "react";
 import confetti from 'canvas-confetti';
 import sleep from "../../utils/sleep";
-import { Box } from "../../components/Box";
-import { count } from "console";
 
 const Login: NextPage = () => {
   
@@ -42,7 +40,7 @@ const Login: NextPage = () => {
     const { value: titleValue, reset: resetTitle, bindings: titleBindings } = useInput("");
     const { value: bodyValue, reset: resetBody, bindings: bodyBindings } = useInput("");
 
-    const onSubmit = async (event: any) => {
+    const onSubmit = async () => {
       setLoading(true)
       if (titleValue.length < minimalTitleLetters || titleValue.length > maximalTitleLetters) {
         setLoading(false)
@@ -53,7 +51,7 @@ const Login: NextPage = () => {
         return
       }
       try {
-        const {data, error} = await supabaseClient
+        const {error} = await supabaseClient
           .from("articles")
           .insert([
             {
@@ -64,11 +62,13 @@ const Login: NextPage = () => {
             }
           ])
           .single()
-          if (error) throw error;
+          if (error) {
+              alert(error.message)
+          }
           resetTitle();
           resetBody();
           setLoading(false)
-          successModalVisibilityHandler()
+          await successModalVisibilityHandler()
       } catch(error: any) {
           alert(error.message)
           setLoading(false)
@@ -92,21 +92,14 @@ const Login: NextPage = () => {
     }
 
     function shouldMarkBoldTitleCounter() : boolean {
-      if (titleValue.length < minimalBodyLetter || titleValue.length > maximalBodyLetters) {
-        return true
-      } else {
-        return false
-      }
+      return titleValue.length < minimalBodyLetter || titleValue.length > maximalBodyLetters;
     }
 
     function shouldMarkBoldBodyCounter() : boolean {
-      if (bodyValue.length < minimalBodyLetter || bodyValue.length > maximalBodyLetters) {
-        return true
-      } else {
-        return false
-      }
+      return bodyValue.length < minimalBodyLetter || bodyValue.length > maximalBodyLetters;
     }
 
+    // @ts-ignore
     return (
       <>
         <Grid.Container gap={1}>
@@ -161,7 +154,7 @@ const Login: NextPage = () => {
                 </Text>
             </Grid>
             <Grid xs={12} justify='flex-end' css={{marginRight: 16}}>
-                <Text color="#7C7C7C">Posting as {user?.email} (chill bro, it will be anonymous 🥷🏻)</Text>
+                <Text color="#7C7C7C">Posting as <Text b  color="#7c7c7c" css={{marginRight:6}}>{user?.id?.substring(0,5)}</Text>🥷🏻🔒</Text>
             </Grid>
             <Button isDisabled={isLoading} shadow css={{margin: '0 auto', display: "flex", marginTop: 16}} onPress={onSubmit}>
               {isLoading ?
