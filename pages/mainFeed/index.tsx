@@ -39,6 +39,7 @@ const MainFeed: NextPage = () => {
                 .from("articles")
                 .select("*", { count: "exact" })
                 .order("likes_count", { ascending: false })
+                .eq("approved", true)
                 .range(0, 9)
             if (error) {
                 alert(error.message)
@@ -61,6 +62,7 @@ const MainFeed: NextPage = () => {
             .from("articles")
             .select("*", { count: "exact" })
             .order("likes_count", { ascending: false })
+            .eq("approved", true)
             .range(from, to);
 
         if (data != null) {

@@ -207,7 +207,6 @@ const Article: NextPage = () => {
                         size="md"
                     />
                     <Spacer y={.5}/>
-
                     <Text size={"$lg"}>{article.content}</Text>
                     {supaUser ?
                         <>
