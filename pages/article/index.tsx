@@ -28,7 +28,7 @@ const Article: NextPage = () => {
             try {
                 const {data, error} = await supabaseClient
                     .from(dbConstants.articles)
-                    .select(dbConstants.all)
+                    .select("*")
                     .filter(dbConstants.id, "eq", id)
                     .single()
                 if (error) {
@@ -65,7 +65,7 @@ const Article: NextPage = () => {
     const getArticle = async () => {
         const {data, error} = await supabaseClient
             .from(dbConstants.articles)
-            .select(dbConstants.all)
+            .select("*")
             .filter(dbConstants.id, "eq", id)
             .single()
 
