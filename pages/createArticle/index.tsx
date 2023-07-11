@@ -6,6 +6,7 @@ import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import { useState } from "react";
 import confetti from 'canvas-confetti';
 import sleep from "../../utils/sleep";
+import {colors} from "../../colors/colorConstants";
 
 const Login: NextPage = () => {
   
@@ -178,13 +179,17 @@ const Login: NextPage = () => {
         >
           <Modal.Header>
             <Text id="success-modal-title" size={18}>
-              Article published.
+              Proposal under <Text b color={colors.primary}>review</Text>.
             </Text>
           </Modal.Header>
+            <Modal.Body>
+                <Text>
+                    Your proposal is under review and will be published shortly! ⏱️
+                </Text>
+            </Modal.Body>
           <Modal.Footer justify="center">
-            
             <Button auto flat color={"success"} onPress={closeAndNavigateToMainFeed}>
-              Go to Articles Feed
+              Go to Main Feed
             </Button>
             <Button auto flat color={"primary"} onPress={closeSuccessModalHandler}>
               Write a new article 📝

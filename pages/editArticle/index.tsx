@@ -2,16 +2,19 @@ import type { GetServerSidePropsContext, NextPage } from "next";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 import { useRouter } from "next/router";
-import { Text, Textarea, Grid, Button, Loading, useInput } from "@nextui-org/react";
+import {Text, Textarea, Grid, Button, Loading, useInput, Modal} from "@nextui-org/react";
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import { useState } from "react";
 import { useEffect } from "react";
+import sleep from "../../utils/sleep";
+import {colors} from "../../colors/colorConstants";
 
 const EditArticle: NextPage = () => {
   
     const supabaseClient = useSupabaseClient()
     const user = useUser()
     const router = useRouter()
+    const [isSuccessModalVisible, setSuccessModalVisible] = useState(false)
 
     const [isLoading, setLoading] = useState(false)
 
@@ -24,6 +27,19 @@ const EditArticle: NextPage = () => {
 
     const { value: titleValue, setValue: setTitleValue, bindings: titleBindings } = useInput("");
     const { value: bodyValue, setValue: setBodyValue, bindings: bodyBindings } = useInput("");
+
+    const successModalVisibilityHandler = async () => {
+        setSuccessModalVisible(true)
+    }
+
+    const closeSuccessModalHandler = () => {
+        setSuccessModalVisible(false)
+    }
+
+    const closeAndNavigateToMainFeed = () => {
+        setSuccessModalVisible(false)
+        router.push("/mainFeed");
+    }
 
     useEffect(() => {
         async function getArticle() {
@@ -61,8 +77,10 @@ const EditArticle: NextPage = () => {
           .from("articles")
           .update([
             {
-              title: titleValue,
-              content: bodyValue
+                title: titleValue,
+                content: bodyValue,
+                moderated: false,
+                approved: false
             }
           ])
           .eq("id", id)
@@ -70,7 +88,7 @@ const EditArticle: NextPage = () => {
               alert(error.message)
           }
           setLoading(false)
-          await router.push("/article?id=" + id)
+          await successModalVisibilityHandler()
       } catch(error: any) {
           alert(error.message)
           setLoading(false)
@@ -169,6 +187,33 @@ const EditArticle: NextPage = () => {
               }
               </Button>
         </Grid.Container>
+          <Modal
+              closeButton
+              blur
+              aria-labelledby="success-saved-article-modal"
+              open={isSuccessModalVisible}
+              onClose={closeSuccessModalHandler}
+          >
+              <Modal.Header>
+                  <Text id="success-modal-title" size={18}>
+                      Proposal edit under <Text b color={colors.primary}>review</Text>.
+                  </Text>
+              </Modal.Header>
+              <Modal.Body>
+                  <Text>
+                      Your proposal edit is under review and will be published shortly! ⏱️
+                  </Text>
+              </Modal.Body>
+              <Modal.Footer justify="center">
+                  <Button auto flat color={"success"} onPress={closeAndNavigateToMainFeed}>
+                      Go to Main Feed
+                  </Button>
+                  <Button auto flat color={"primary"} onPress={closeSuccessModalHandler}>
+                      Keep editing 📝
+                  </Button>
+
+              </Modal.Footer>
+          </Modal>
       </>
         
     )

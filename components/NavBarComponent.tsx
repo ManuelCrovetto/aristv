@@ -1,36 +1,56 @@
 import { Navbar, Button, Text, Link } from "@nextui-org/react";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-
 import { useRouter } from "next/router";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Layout } from "./Layout";
-
+import {routes} from "../navigation/routes";
+import {dbConstants} from "../db/dbConstants";
 
 const NavBarComponent = () => {
-    const [variant, setVariant] = React.useState("default");
-    const [activeColor, setActiveColor] = React.useState("primary")
     const supabaseClient = useSupabaseClient()
-    const user = useUser()
+    const supaUser = useUser()
     const router = useRouter()
+    const [isAdmin, setIsAdmin] = useState(false)
 
     function signOutUser() {
         supabaseClient.auth.signOut();
-        router.push("/")
+        router.push(routes.home)
     }
 
-    const collapseItems = [
-       "Main Feed",
-       "Create Article"
-      ];
+    useEffect(() => {
+        async function isUserAdmin() {
+            const {data: {user}} = await supabaseClient.auth.getUser()
+            try {
+                const {data, error} = await supabaseClient
+                    .from(dbConstants.users)
+                    .select("*")
+                    .filter("user_id", "eq", user?.id)
+                    .single()
+                if (error) {
+                    setIsAdmin(false)
+                } else {
+                    setIsAdmin(data.isadmin)
+                }
+
+            } catch (e: any) {
+                alert(e.message)
+            }
+        }
+        if (typeof supaUser !== "undefined") {
+            isUserAdmin()
+        }
+    }, [supaUser, supabaseClient])
+
+
     
 
     return (
         <Layout>
             <Navbar isBordered variant="floating">
-                <Navbar.Toggle showIn="xs" />
+                <Navbar.Toggle showIn="sm" />
                 <Navbar.Brand
                 as={Link}
-                href={"/"}
+                href={routes.home}
                 >
                 
                 <Text b css={{textGradient: "45deg, #7954F6 -20%, #DA545E 100%"}}>
@@ -38,18 +58,25 @@ const NavBarComponent = () => {
                 </Text>
                 </Navbar.Brand>
                 <Navbar.Content
-                hideIn="xs"
+                hideIn="sm"
                 variant="highlight-rounded"
                 >
-                <Navbar.Link href="/mainFeed" isActive={router.pathname === "/mainFeed"}>Main Feed</Navbar.Link>
-                <Navbar.Link href="/createArticle" isActive={router.pathname === "/createArticle"}>
+                <Navbar.Link href={routes.mainFeed} isActive={router.pathname === routes.mainFeed}>Main Feed</Navbar.Link>
+                <Navbar.Link href={routes.createArticle} isActive={router.pathname === routes.createArticle}>
                     Create Proposal
                 </Navbar.Link>
+                    { isAdmin ?
+                        <>
+                            <Navbar.Link color={"error"}  href={routes.moderator} isActive={router.pathname === routes.moderator}>Moderator</Navbar.Link>
+                        </>
+                        :
+                        null
+                    }
                 </Navbar.Content>
                 <Navbar.Content>
-                {!user ?  /*User doesnt exist*/
+                {!supaUser ?  /*User doesnt exist*/
                     <>
-                        <Navbar.Link href="/login">
+                        <Navbar.Link href={routes.login}>
                             <Button auto flat>
                                 Login
                             </Button>
@@ -58,7 +85,7 @@ const NavBarComponent = () => {
                 :         /* User does exist */
                     <>
                         <Navbar.Item hideIn={"xs"}>
-                            <Text>Hey, {user?.email}</Text>
+                            <Text>Hey, {supaUser?.email}</Text>
                         </Navbar.Item>
                         <Navbar.Item>
                             <Button auto flat onPress={() => signOutUser()}>
@@ -67,29 +94,29 @@ const NavBarComponent = () => {
                         </Navbar.Item>
                     </>
                 }  
-            </Navbar.Content>
+                </Navbar.Content>
                 <Navbar.Collapse>
                     <Navbar.CollapseItem
-                        key={"/mainFeed"}
+                        key={routes.mainFeed}
                         activeColor="primary"
-                        isActive={router.pathname === "/mainFeed"}
+                        isActive={router.pathname === routes.mainFeed}
                     >
                         <Link
                             color="inherit"
-                            href={"/mainFeed"}
+                            href={routes.mainFeed}
                             css={{minWidth: "100%",}}
                         >
                             {"Main Feed"}
                         </Link>
                     </Navbar.CollapseItem>
                     <Navbar.CollapseItem
-                        key={"/createArticle"}
+                        key={routes.createArticle}
                         activeColor="primary"
-                        isActive={router.pathname === "/createArticle"}
+                        isActive={router.pathname === routes.createArticle}
                     >
                         <Link
                             color="inherit"
-                            href={"/createArticle"}
+                            href={routes.createArticle}
                             css={{minWidth: "100%",}}
                         >
                             {"Create Proposal"}

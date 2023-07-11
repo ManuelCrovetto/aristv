@@ -4,5 +4,5 @@ const UnstyledSvg = styled('svg', {});
 const UnstyledPath = styled('path', {});
 
 export const Svg = Object.assign(UnstyledSvg, {
-   Path: UnstyledPath,
+    Path: UnstyledPath,
 });

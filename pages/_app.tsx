@@ -7,6 +7,7 @@ import { Box } from "../components/Box";
 import Navbar from '../components/NavBarComponent';
 import Footer from '../components/Footer';
 
+
 function MyApp({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() => createPagesBrowserClient());
 

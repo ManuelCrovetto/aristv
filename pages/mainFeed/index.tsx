@@ -4,6 +4,8 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import ArticleCard from "../../components/ArticleCard";
 import { getPagination } from "../../utils/Utils";
+import {dbConstants} from "../../db/dbConstants";
+
 
 const MainFeed: NextPage = () => {
     const supabaseClient = useSupabaseClient();
@@ -20,8 +22,9 @@ const MainFeed: NextPage = () => {
     const getArticlesSize = async () => {
         try {
             const {count } = await supabaseClient
-                .from("articles")
-                .select('*', { count: 'exact' })
+                .from(dbConstants.articles)
+                .select(dbConstants.all, { count: 'exact' })
+                .eq(dbConstants.moderated, "true")
             
             if (count != null) {
                 const numberOfPagesRoundedUp = Math.ceil(count / maxResultsPerPage)
@@ -36,9 +39,10 @@ const MainFeed: NextPage = () => {
         setIsLoading(true)
         try {
             const {data, error} = await supabaseClient
-                .from("articles")
-                .select("*", { count: "exact" })
-                .order("likes_count", { ascending: false })
+                .from(dbConstants.articles)
+                .select(dbConstants.all, { count: "exact" })
+                .order(dbConstants.likesCount, { ascending: false })
+                .eq(dbConstants.approved, true)
                 .range(0, 9)
             if (error) {
                 alert(error.message)
@@ -58,9 +62,10 @@ const MainFeed: NextPage = () => {
         const { from, to } = getPagination(page, maxResultsPerPage);
         console.log(`from: ${from}, to: ${to}, page: ${page}`)
         const { data, count } = await supabaseClient
-            .from("articles")
-            .select("*", { count: "exact" })
-            .order("likes_count", { ascending: false })
+            .from(dbConstants.articles)
+            .select(dbConstants.all, { count: "exact" })
+            .order(dbConstants.likesCount, { ascending: false })
+            .eq(dbConstants.approved, true)
             .range(from, to);
 
         if (data != null) {
