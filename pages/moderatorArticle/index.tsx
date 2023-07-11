@@ -9,15 +9,15 @@ const ModeratorArticle: NextPage = () => {
     const supabaseClient = useSupabaseClient();
     const router = useRouter();
     const supaUser = useUser();
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const {id} = router.query;
     const [article, setArticle] = useState<any>({});
     const [isAdmin, setIsAdmin] = useState(false)
 
 
     useEffect(() => {
+        setIsLoading(true)
         async function getArticleWithUseEffect() {
-            setIsLoading(true)
             try {
                 const {data, error} = await supabaseClient
                     .from("articles")
@@ -26,6 +26,7 @@ const ModeratorArticle: NextPage = () => {
                     .single()
                 if (error) {
                     console.log(error)
+                    setIsLoading(false)
                 } else {
                     setArticle(data);
                 }
@@ -45,12 +46,12 @@ const ModeratorArticle: NextPage = () => {
                     .single()
                 if (error) {
                     console.log(error)
-                    router.push(routes.mainFeed)
+                    setIsLoading(false)
+                    setIsAdmin(false)
                     return
                 } else {
                     if (!data.isadmin) {
                         setIsAdmin(false)
-                        router.push(routes.mainFeed)
                         return
                     } else {
                         setIsAdmin(true)
@@ -62,8 +63,8 @@ const ModeratorArticle: NextPage = () => {
                 }
             } catch (error: any) {
                 alert(error.message)
-                setIsLoading(false)
-                router.push(routes.mainFeed)
+                setIsAdmin(false)
+                await router.push(routes.mainFeed)
             }
         }
 
@@ -74,78 +75,73 @@ const ModeratorArticle: NextPage = () => {
     }, [id, supaUser])
 
     const evaluateApproval = async (isApproved: boolean) => {
-        try {
-            const {errorSettingApproval} = await supabaseClient
-                .from(dbConstants.articles)
-                .update([
-                    {
-                        approved: isApproved
-                    }
-                ])
-                .eq("id", id)
+        if (isAdmin) {
+            try {
+                const {error: errorSettingApproval} = await supabaseClient
+                    .from(dbConstants.articles)
+                    .update([
+                        {
+                            approved: isApproved
+                        }
+                    ])
+                    .eq("id", id)
 
-            const {errorSettingModeration} = await supabaseClient
-                .from(dbConstants.articles)
-                .update([
-                    {
-                        moderated: true
-                    }
-                ])
-                .eq("id", id)
-            if (errorSettingApproval || errorSettingModeration) {
-                alert("Error during moderation, please contact Macro.")
-            } else {
-                await router.push(routes.mainFeed)
+                const {error: errorSettingModeration} = await supabaseClient
+                    .from(dbConstants.articles)
+                    .update([
+                        {
+                            moderated: true
+                        }
+                    ])
+                    .eq("id", id)
+                if (errorSettingApproval || errorSettingModeration) {
+                    alert("Error during moderation, please contact Macro.")
+                } else {
+                    await router.push(routes.mainFeed)
+                }
+            } catch (error: any) {
+                alert(error.message)
             }
-        } catch (error: any) {
-            alert(error.message)
         }
     }
 
-    return (
-        <>
-            {isAdmin ?
+    if (isLoading) {
+        return (
+            <Loading type="points" color="primary" css={{display: "flex", margin: "0 auto"}}/>
+        )
+    } else {
+        if (isAdmin) {
+            return (
                 <>
-                {isLoading ?
-                        <>
-                            <Loading type="points" color="primary" css={{display: "flex", margin: "0 auto"}}/>
-                        </>
-                        :
-                        <>
-                            <Text h2>{article.title}</Text>
-                            <Spacer y={.5}/>
-                            <User
-                                src="https://i.ytimg.com/vi/U812TsXhZmQ/maxresdefault.jpg"
-                                name={article.user_id?.substring(0,5)}
-                                size="md"
-                            />
-                            <Spacer y={.5}/>
-                            <Text size={"$lg"}>{article.content}</Text>
-                            {isAdmin ?
-                                <>
-                                    <Spacer y={2} />
-                                    <Grid.Container justify={"space-between"}>
-                                        <Spacer />
-                                        <Grid>
-                                            <Button color={"success"} shadow onPress={() => evaluateApproval(true)}>Approve ✅</Button>
-                                        </Grid>
-                                        <Grid>
-                                            <Button color={"error"} flat shadow onPress={() => evaluateApproval(false)}>Disapprove 🚫🚨</Button>
-                                        </Grid>
-                                        <Spacer />
-                                    </Grid.Container>
-                                    <Spacer y={.5} />
-
-                                </>
-                                : null}
-                        </>
-                }
+                    <Text h2>{article.title}</Text>
+                    <Spacer y={.5}/>
+                    <User
+                        src="https://i.ytimg.com/vi/U812TsXhZmQ/maxresdefault.jpg"
+                        name={article.user_id?.substring(0,5)}
+                        size="md"
+                    />
+                    <Spacer y={.5}/>
+                    <Text size={"$lg"}>{article.content}</Text>
+                    <Spacer y={2} />
+                    <Grid.Container justify={"space-between"}>
+                        <Spacer />
+                        <Grid>
+                            <Button color={"success"} shadow onPress={() => evaluateApproval(true)}>Approve ✅</Button>
+                        </Grid>
+                        <Grid>
+                            <Button color={"error"} flat shadow onPress={() => evaluateApproval(false)}>Disapprove 🚫🚨</Button>
+                        </Grid>
+                        <Spacer />
+                    </Grid.Container>
+                    <Spacer y={.5} />
                 </>
-                :
-                null
-            }
-        </>
-    )
+            )
+        } else  {
+            return (
+                <Text h2 b>...is it you Afala? 🙄</Text>
+            )
+        }
+    }
 }
 
 export default ModeratorArticle;

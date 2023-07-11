@@ -18,7 +18,7 @@ const NavBarComponent = () => {
     }
 
     useEffect(() => {
-        async function isUserAdmin(): boolean {
+        async function isUserAdmin() {
             const {data: {user}} = await supabaseClient.auth.getUser()
             try {
                 const {data, error} = await supabaseClient
@@ -27,7 +27,6 @@ const NavBarComponent = () => {
                     .filter("user_id", "eq", user?.id)
                     .single()
                 if (error) {
-                    console.log(`Error while fetching isAdmin property. Error: ${error.message}`);
                     setIsAdmin(false)
                 } else {
                     setIsAdmin(data.isadmin)
@@ -35,7 +34,6 @@ const NavBarComponent = () => {
 
             } catch (e: any) {
                 alert(e.message)
-                return false
             }
         }
         if (typeof supaUser !== "undefined") {
@@ -49,7 +47,7 @@ const NavBarComponent = () => {
     return (
         <Layout>
             <Navbar isBordered variant="floating">
-                <Navbar.Toggle showIn="xs" />
+                <Navbar.Toggle showIn="sm" />
                 <Navbar.Brand
                 as={Link}
                 href={routes.home}
@@ -60,7 +58,7 @@ const NavBarComponent = () => {
                 </Text>
                 </Navbar.Brand>
                 <Navbar.Content
-                hideIn="xs"
+                hideIn="sm"
                 variant="highlight-rounded"
                 >
                 <Navbar.Link href={routes.mainFeed} isActive={router.pathname === routes.mainFeed}>Main Feed</Navbar.Link>

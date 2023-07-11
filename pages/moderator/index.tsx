@@ -3,10 +3,8 @@ import {useSupabaseClient} from "@supabase/auth-helpers-react";
 import {useEffect, useState} from "react";
 import {getPagination} from "../../utils/Utils";
 import {Container, Loading, Pagination, Spacer, Text} from "@nextui-org/react";
-import ArticleCard from "../../components/ArticleCard";
 import {routes} from "../../navigation/routes";
 import {dbConstants} from "../../db/dbConstants";
-import ModeratorArticle from "../moderatorArticle";
 import ModeratorCard from "../../components/ModeratorCard";
 import {useRouter} from "next/navigation";
 
@@ -15,11 +13,13 @@ const Moderator: NextPage = () => {
     const [articles, setArticles] = useState<string[]>([]);
     const maxResultsPerPage = 10
     const [numberOfPages, setNumberOfPages] = useState(0)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isPageLoading, setIsPageLoading] = useState(true)
+    const [areArticlesLoading, setArticlesLoading] = useState(false)
     const router = useRouter()
     const [isUserAdmin, setIsAdmin] = useState(false)
 
     useEffect(() => {
+        setIsPageLoading(true)
         isAdmin().then(r => {})
     }, [])
 
@@ -32,16 +32,16 @@ const Moderator: NextPage = () => {
                 .filter("user_id", "eq", user?.id)
                 .single()
             if (error) {
-                console.log(`Error while fetching isAdmin property. Error: ${error.message}`);
+                setIsPageLoading(false)
                 setIsAdmin(false)
-                router.push(routes.mainFeed)
                 return
             } else {
                 if (!data.isadmin) {
+                    setIsPageLoading(false)
                     setIsAdmin(false)
-                    router.push(routes.mainFeed)
                     return
                 } else {
+                    setIsPageLoading(false)
                     setIsAdmin(true)
                     getArticlesSize().then(() => {})
                     loadFirstArticlesPage().then(() => {})
@@ -56,17 +56,13 @@ const Moderator: NextPage = () => {
 
     const getArticlesSize = async () => {
         try {
-            const {data, error } = await supabaseClient
+            const { count } = await supabaseClient
                 .from(dbConstants.articles)
-                .select(dbConstants.all)
-
-            if (error) {
-                alert(error.message)
-            } else {
-                if (data != null) {
-                    const numberOfPagesRoundedUp = Math.ceil(data.length / maxResultsPerPage)
-                    setNumberOfPages(numberOfPagesRoundedUp)
-                }
+                .select(dbConstants.all, { count: "exact" })
+                .eq("moderated", "false")
+            if (count != null) {
+                const numberOfPagesRoundedUp = Math.ceil(count / maxResultsPerPage)
+                setNumberOfPages(numberOfPagesRoundedUp)
             }
         } catch (error: any) {
             alert(error.message)
@@ -74,7 +70,7 @@ const Moderator: NextPage = () => {
     }
 
     const loadFirstArticlesPage = async () => {
-        setIsLoading(true)
+        setArticlesLoading(true)
         try {
             const {data, error} = await supabaseClient
                 .from(dbConstants.articles)
@@ -87,65 +83,72 @@ const Moderator: NextPage = () => {
             if (data != null) {
                 setArticles(data)
             }
-            setIsLoading(false)
+            setArticlesLoading(false)
         } catch(error: any) {
             alert(error.message)
-            setIsLoading(false)
+            setArticlesLoading(false)
         }
     }
 
     const handlePagination = async (page: number) => {
-        setIsLoading(true)
+        setArticlesLoading(true)
         const { from, to } = getPagination(page, maxResultsPerPage);
         console.log(`from: ${from}, to: ${to}, page: ${page}`)
         const { data } = await supabaseClient
-            .from("articles")
-            .select("*")
+            .from(dbConstants.articles)
+            .select(dbConstants.all)
             .eq("moderated", "false")
             .range(from, to);
 
         if (data != null) {
             setArticles(data)
         }
-        setIsLoading(false)
+        setArticlesLoading(false)
     }
-
-    return (
-        <>
-            { isUserAdmin ?
+    if (isPageLoading) {
+        return (
+            <>
+                <Spacer y={2} />
+                <Loading type="points" color="primary" css={{display: "flex", margin: "0 auto"}}/>
+            </>
+        )
+    } else {
+        if (isUserAdmin) {
+            return (
                 <>
                     <Text h2>Unmoderated Proposals</Text>
-                    <Text size="$lg" css={{my: "$8"}}>Make sure they don't troll us too much 😂</Text>
+                    <Text size="$lg" css={{my: "$8"}}>Make sure they do not troll us too much 😂</Text>
                     {
-                        articles.map((article) => {
-                            return(
-                                <>
-                                    <ModeratorCard article={article} />
-                                </>
-                            )
-                        })
-                    }
-                    {
-                        isLoading ?
+                        areArticlesLoading ?
                             <>
                                 <Spacer y={2} />
                                 <Loading type="points" color="primary" css={{display: "flex", margin: "0 auto"}}/>
                             </>
                             :
-                            null
+                            <>
+                                {
+                                    articles.map((article) => {
+                                        return(
+                                            <>
+                                                <ModeratorCard article={article} />
+                                            </>
+                                        )
+                                    })
+                                }
+                            </>
                     }
                     <Spacer y={4} />
                     <Container justify="center" css={{ display: 'flex', margin: '0 auto'}}>
                         <Pagination noMargin shadow total={numberOfPages} initialPage={1} onChange={handlePagination} />
                     </Container>
                 </>
-                :
-
-                null
-            }
-        </>
-
-    )
+            )
+        } else {
+            return (
+                <Text h2 b>Quieres puños flutter y java para dejarte en la mierda? Fuera de aquí.</Text>
+            )
+        }
+    }
 }
 
 export default Moderator;

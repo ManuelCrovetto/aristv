@@ -5,6 +5,8 @@ import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 import {HeartIcon} from "../../components/icons/icons";
 import confetti from 'canvas-confetti';
+import {dbConstants} from "../../db/dbConstants";
+import {routes} from "../../navigation/routes";
 
 
 const Article: NextPage = () => {
@@ -25,9 +27,9 @@ const Article: NextPage = () => {
 
             try {
                 const {data, error} = await supabaseClient
-                    .from("articles")
-                    .select("*")
-                    .filter("id", "eq", id)
+                    .from(dbConstants.articles)
+                    .select(dbConstants.all)
+                    .filter(dbConstants.id, "eq", id)
                     .single()
                 if (error) {
                     console.log(error)
@@ -62,9 +64,9 @@ const Article: NextPage = () => {
 
     const getArticle = async () => {
         const {data, error} = await supabaseClient
-            .from("articles")
-            .select("*")
-            .filter("id", "eq", id)
+            .from(dbConstants.articles)
+            .select(dbConstants.all)
+            .filter(dbConstants.id, "eq", id)
             .single()
 
         if (error) {
@@ -91,14 +93,14 @@ const Article: NextPage = () => {
     const deleteArticle = async () => {
         try {
             const {error} = await supabaseClient
-                .from("articles")
+                .from(dbConstants.articles)
                 .delete()
-                .eq("id", id)
+                .eq(dbConstants.id, id)
             if (error) {
                 alert(error.message)
-                await router.push("/mainFeed")
+                await router.push(routes.mainFeed)
             }
-            await router.push("/mainFeed")
+            await router.push(routes.mainFeed)
         } catch (error: any) {
             alert(error.message)
         }
@@ -111,14 +113,14 @@ const Article: NextPage = () => {
             const likesQty = arrayOfUsersLikes.length
             try {
                 const {error} = await supabaseClient
-                    .from("articles")
+                    .from(dbConstants.articles)
                     .update([
                         {
                             likes: arrayOfUsersLikes,
                             likes_count: likesQty
                         }
                     ])
-                    .eq("id", id)
+                    .eq(dbConstants.id, id)
                 if (error) {
                     alert(error.message)
                 }
@@ -136,14 +138,14 @@ const Article: NextPage = () => {
             let likesQty = arrayOfUsersLikes.length;
             try {
                 const {error} = await supabaseClient
-                    .from("articles")
+                    .from(dbConstants.articles)
                     .update([
                         {
                             likes: arrayOfUsersLikes,
                             likes_count: likesQty
                         }
                     ])
-                    .eq("id", id)
+                    .eq(dbConstants.id, id)
                 if (error) {
                     alert(error.message)
                 }
@@ -193,7 +195,6 @@ const Article: NextPage = () => {
         <>
             {isLoading ?
                 <>
-
                     <Loading type="points" color="primary" css={{display: "flex", margin: "0 auto"}}/>
                 </>
                 :
