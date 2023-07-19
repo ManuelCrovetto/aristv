@@ -1,4 +1,4 @@
-import {Avatar, Button, Grid, Link, Row, Spacer, Text, User} from "@nextui-org/react";
+import {Grid, Link, Spacer, Text} from "@nextui-org/react";
 import { NextPage } from "next";
 import React from "react";
 import useWindowDimensions from "../utils/Utils";
@@ -29,7 +29,7 @@ const Footer: NextPage = () => {
         return (
             <Grid.Container alignItems={"center"} alignContent={"center"} direction={"column"} justify={"space-between"} css={{background: "#D9DBDF", padding: 16, borderTopLeftRadius: 8, borderTopRightRadius: 8, margin: "auto", position: "absolute", textAlignment: "center"}}>
                 <Grid>
-                    <Text b >Made with ❤️ by MacroSystems LLC for AristiDevs</Text>
+                    <Text b >Made with ❤️ by <Link target={"_blank"} href={"https://www.macrosystems.dev/"}>MacroSystems</Link> for <Link target={"_blank"} href={"https://www.youtube.com/c/aristidevs"} color={"error"}>AristiDevs</Link></Text>
                 </Grid>
             </Grid.Container>
         )
@@ -43,7 +43,7 @@ const Footer: NextPage = () => {
                 </Grid>
                 <Spacer />
                 <Grid>
-                    <Text b >Made with ❤️ by MacroSystems LLC for AristiDevs</Text>
+                    <Text b >Made with ❤️ by <Link target={"_blank"} href={"https://www.macrosystems.dev/"}>MacroSystems</Link> for <Link target={"_blank"} href={"https://www.youtube.com/c/aristidevs"} color={"error"}>AristiDevs</Link></Text>
                 </Grid>
                 <Spacer />
                 <Grid justify={"center"}>
@@ -69,7 +69,7 @@ const Footer: NextPage = () => {
                 </Grid>
                 <Spacer />
                 <Grid>
-                    <Text b >Made with ❤️ by MacroSystems LLC for AristiDevs</Text>
+                    <Text b >Made with ❤️ by <Link target={"_blank"} href={"https://www.macrosystems.dev/"}>MacroSystems</Link> for <Link target={"_blank"} href={"https://www.youtube.com/c/aristidevs"} color={"error"}>AristiDevs</Link></Text>
                 </Grid>
                 <Spacer />
                 <Grid direction={"row"}>
