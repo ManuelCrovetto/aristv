@@ -1,4 +1,4 @@
-import { Navbar, Button, Text, Link } from "@nextui-org/react";
+import {Navbar, Button, Text, Link, Badge} from "@nextui-org/react";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import React, {useEffect, useState} from "react";
@@ -6,11 +6,13 @@ import { Layout } from "./Layout";
 import {routes} from "../navigation/routes";
 import {dbConstants} from "../db/dbConstants";
 
+
 const NavBarComponent = () => {
     const supabaseClient = useSupabaseClient()
     const supaUser = useUser()
     const router = useRouter()
     const [isAdmin, setIsAdmin] = useState(false)
+    const [modNumber, setModNumber] = useState<string | undefined>()
 
     function signOutUser() {
         supabaseClient.auth.signOut();
@@ -23,13 +25,32 @@ const NavBarComponent = () => {
             try {
                 const {data, error} = await supabaseClient
                     .from(dbConstants.users)
-                    .select("*")
-                    .filter("user_id", "eq", user?.id)
+                    .select(dbConstants.all)
+                    .filter(dbConstants.user_id, "eq", user?.id)
                     .single()
                 if (error) {
                     setIsAdmin(false)
                 } else {
-                    setIsAdmin(data.isadmin)
+                    const anyData = data as any;
+
+                    const admin = anyData.isadmin
+                    setIsAdmin(admin)
+                }
+                const { count } = await supabaseClient
+                    .from(dbConstants.articles)
+                    .select(dbConstants.all, {count: "exact"})
+                    .eq(dbConstants.moderated, "false")
+
+                if (count) {
+                    if (count >= 1) {
+                        if (count >= 10) {
+                            setModNumber("+9")
+                        } else {
+                            setModNumber(count.toString())
+                        }
+                    }
+                } else {
+                    setModNumber(undefined)
                 }
 
             } catch (e: any) {
@@ -65,12 +86,20 @@ const NavBarComponent = () => {
                 <Navbar.Link href={routes.createArticle} isActive={router.pathname === routes.createArticle}>
                     Create Proposal
                 </Navbar.Link>
-                    { isAdmin ?
+                    { isAdmin &&
                         <>
-                            <Navbar.Link color={"error"}  href={routes.moderator} isActive={router.pathname === routes.moderator}>Moderator</Navbar.Link>
+                            { modNumber ?
+                                <Badge color={"error"} content={modNumber} enableShadow disableOutline>
+                                    <Navbar.Link color={"error"}  href={routes.moderator} isActive={router.pathname === routes.moderator}>
+                                        Moderator
+                                    </Navbar.Link>
+                                </Badge>
+                                :
+                                <Navbar.Link color={"error"}  href={routes.moderator} isActive={router.pathname === routes.moderator}>
+                                    Moderator
+                                </Navbar.Link>
+                            }
                         </>
-                        :
-                        null
                     }
                 </Navbar.Content>
                 <Navbar.Content>
