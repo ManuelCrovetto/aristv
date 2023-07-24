@@ -6,6 +6,7 @@ import { Layout } from "./Layout";
 import {routes} from "../navigation/routes";
 import {dbConstants} from "../db/dbConstants";
 
+
 const NavBarComponent = () => {
     const supabaseClient = useSupabaseClient()
     const supaUser = useUser()
@@ -27,16 +28,18 @@ const NavBarComponent = () => {
                     .select(dbConstants.all)
                     .filter(dbConstants.user_id, "eq", user?.id)
                     .single()
+                if (error) {
+                    setIsAdmin(false)
+                } else {
+                    const anyData = data as any;
+
+                    const admin = anyData.isadmin
+                    setIsAdmin(admin)
+                }
                 const { count } = await supabaseClient
                     .from(dbConstants.articles)
                     .select(dbConstants.all, {count: "exact"})
                     .eq(dbConstants.moderated, "false")
-
-                if (error) {
-                    setIsAdmin(false)
-                } else {
-                    setIsAdmin(data.isadmin)
-                }
 
                 if (count) {
                     if (count >= 1) {
