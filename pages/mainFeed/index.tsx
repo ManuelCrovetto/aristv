@@ -24,7 +24,7 @@ const MainFeed: NextPage = () => {
             const {count } = await supabaseClient
                 .from(dbConstants.articles)
                 .select(dbConstants.all, { count: 'exact' })
-                .eq(dbConstants.moderated, "true")
+                .eq(dbConstants.approved, "true")
             
             if (count != null) {
                 const numberOfPagesRoundedUp = Math.ceil(count / maxResultsPerPage)
